@@ -1,11 +1,11 @@
 package paveljakov.transfer;
 
-public class App {
+public class Main {
 
     public static void main(final String[] args) {
-        DaggerAppService
+        DaggerApplication
                 .create()
-                .restService()
+                .appService()
                 .start();
     }
 

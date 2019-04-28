@@ -15,4 +15,24 @@ public class ConfigurationImpl implements Configuration {
         return 8080;
     }
 
+    @Override
+    public String getJdbcDriver() {
+        return "org.h2.Driver";
+    }
+
+    @Override
+    public String getJdbcUrl() {
+        return "jdbc:h2:mem:transferdb";
+    }
+
+    @Override
+    public String getJdbcUser() {
+        return "sa";
+    }
+
+    @Override
+    public String getJdbcPasswd() {
+        return null;
+    }
+
 }

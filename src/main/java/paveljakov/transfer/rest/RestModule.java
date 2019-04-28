@@ -2,6 +2,8 @@ package paveljakov.transfer.rest;
 
 import java.util.Set;
 
+import javax.inject.Singleton;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -24,6 +26,7 @@ public abstract class RestModule {
     abstract RestController bindHelloWorldController(HelloWorldController helloWorldController);
 
     @Provides
+    @Singleton
     static Gson provideGson() {
         return new GsonBuilder()
                 .setPrettyPrinting()
