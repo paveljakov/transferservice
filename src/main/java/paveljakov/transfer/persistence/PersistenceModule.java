@@ -3,6 +3,9 @@ package paveljakov.transfer.persistence;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 
+import org.codejargon.fluentjdbc.api.FluentJdbc;
+import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
+import org.codejargon.fluentjdbc.api.query.Query;
 import org.flywaydb.core.Flyway;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -33,6 +36,15 @@ public class PersistenceModule {
         return Flyway.configure()
                 .dataSource(dataSource)
                 .load();
+    }
+
+    @Provides
+    @Singleton
+    Query provideFluentJdbcQuery(final DataSource dataSource) {
+        return new FluentJdbcBuilder()
+                .connectionProvider(dataSource)
+                .build()
+                .query();
     }
 
 }
