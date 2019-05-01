@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.codejargon.fluentjdbc.api.FluentJdbcException;
 import org.codejargon.fluentjdbc.api.mapper.ObjectMappers;
 import org.codejargon.fluentjdbc.api.query.Query;
 
@@ -25,9 +26,14 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public Optional<AccountDto> find(final String id) {
-        return jdbc.select("SELECT * FROM ACCOUNT WHERE ID = :id")
-                .namedParam("id", id)
-                .firstResult(objectMappers.forClass(AccountDto.class));
+        try {
+            return jdbc.select("SELECT * FROM ACCOUNT WHERE ID = :id")
+                    .namedParam("id", id)
+                    .firstResult(objectMappers.forClass(AccountDto.class));
+
+        } catch (FluentJdbcException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
