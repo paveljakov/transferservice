@@ -3,9 +3,7 @@ package paveljakov.transfer.persistence;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
 
-import org.codejargon.fluentjdbc.api.FluentJdbc;
 import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
-import org.codejargon.fluentjdbc.api.mapper.ObjectMappers;
 import org.codejargon.fluentjdbc.api.query.Query;
 import org.flywaydb.core.Flyway;
 
@@ -46,13 +44,6 @@ public class PersistenceModule {
                 .connectionProvider(dataSource)
                 .build()
                 .query();
-    }
-
-    @Provides
-    @Singleton
-    ObjectMappers provideFluentJdbcObjectMappers() {
-        return ObjectMappers.builder()
-                .build();
     }
 
 }

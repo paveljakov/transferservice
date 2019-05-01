@@ -3,23 +3,31 @@ package paveljakov.transfer.rest.transform;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import spark.ResponseTransformer;
 
 @Singleton
 public class JsonTransformer implements ResponseTransformer {
 
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    JsonTransformer(final Gson gson) {
-        this.gson = gson;
+    JsonTransformer(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public String render(final Object model) {
-        return gson.toJson(model);
+        try {
+            return objectMapper
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(model);
+
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

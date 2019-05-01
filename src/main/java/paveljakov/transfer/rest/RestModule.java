@@ -6,19 +6,21 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import dagger.Binds;
 import dagger.MapKey;
 import dagger.Module;
 import dagger.Provides;
-import dagger.multibindings.ClassKey;
 import dagger.multibindings.IntoMap;
 import dagger.multibindings.IntoSet;
 import dagger.multibindings.Multibinds;
 import paveljakov.transfer.rest.controller.AccountController;
 import paveljakov.transfer.rest.controller.RestController;
+import paveljakov.transfer.rest.controller.WalletController;
 import paveljakov.transfer.rest.error.GlobalExceptionHandler;
 import paveljakov.transfer.rest.error.NoSuchElementExceptionHandler;
 import spark.ExceptionHandler;
@@ -37,6 +39,10 @@ public abstract class RestModule {
     abstract RestController bindAccountController(AccountController accountController);
 
     @Binds
+    @IntoSet
+    abstract RestController bindWalletController(WalletController walletController);
+
+    @Binds
     @IntoMap
     @ExceptionType(Exception.class)
     abstract ExceptionHandler bindGlobalExceptionHandler(GlobalExceptionHandler exceptionHandler);
@@ -48,10 +54,11 @@ public abstract class RestModule {
 
     @Provides
     @Singleton
-    static Gson provideGson() {
-        return new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
+    static ObjectMapper provideObjectMapper() {
+        return new ObjectMapper()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .registerModule(new JavaTimeModule());
     }
 
     @MapKey
