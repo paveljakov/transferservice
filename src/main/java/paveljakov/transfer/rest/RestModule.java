@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
 import dagger.multibindings.Multibinds;
-import paveljakov.transfer.rest.controller.HelloWorldController;
+import paveljakov.transfer.rest.controller.AccountController;
 import paveljakov.transfer.rest.controller.RestController;
 
 @Module
@@ -23,7 +23,7 @@ public abstract class RestModule {
 
     @Binds
     @IntoSet
-    abstract RestController bindHelloWorldController(HelloWorldController helloWorldController);
+    abstract RestController bindAccountController(AccountController accountController);
 
     @Provides
     @Singleton
