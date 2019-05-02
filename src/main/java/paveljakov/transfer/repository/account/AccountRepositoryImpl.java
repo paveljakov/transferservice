@@ -12,7 +12,10 @@ import org.codejargon.fluentjdbc.api.query.Query;
 import org.simpleflatmapper.jdbc.JdbcMapper;
 import org.simpleflatmapper.jdbc.JdbcMapperFactory;
 
-import paveljakov.transfer.dto.AccountDto;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.account.AccountDto;
+import paveljakov.transfer.dto.account.CreateAccountDto;
+import paveljakov.transfer.repository.AccountQueries;
 
 @Singleton
 public class AccountRepositoryImpl implements AccountRepository {
@@ -34,7 +37,7 @@ public class AccountRepositoryImpl implements AccountRepository {
         }
 
         try {
-            return jdbc.select("SELECT * FROM ACCOUNT WHERE ID = :id")
+            return jdbc.select(AccountQueries.FIND_BY_ID)
                     .namedParam("id", id)
                     .firstResult(MAPPER::map);
 
@@ -45,22 +48,23 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public List<AccountDto> findAll() {
-        return jdbc.select("SELECT * FROM ACCOUNT")
+        return jdbc.select(AccountQueries.FIND_ALL)
                 .listResult(MAPPER::map);
     }
 
     @Override
-    public Optional<String> insert(final AccountDto accountDto) {
-        if (accountDto == null) {
-            throw new IllegalArgumentException("Parameter accountDto is mandatory!");
+    public Optional<EntityIdResponseDto> insert(final CreateAccountDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Parameter dto is mandatory!");
         }
 
-        return jdbc.update("INSERT INTO ACCOUNT(FIRST_NAME, LAST_NAME, EMAIL) VALUES (:firstName, :lastName, :email)")
-                .namedParam("firstName", accountDto.getFirstName())
-                .namedParam("lastName", accountDto.getLastName())
-                .namedParam("email", accountDto.getEmail())
+        return jdbc.update(AccountQueries.INSERT)
+                .namedParam("firstName", dto.getFirstName())
+                .namedParam("lastName", dto.getLastName())
+                .namedParam("email", dto.getEmail())
                 .runFetchGenKeys(rs -> rs.getString("ID"), new String[] {"ID"})
-                .firstKey();
+                .firstKey()
+                .map(EntityIdResponseDto::new);
     }
 
 }

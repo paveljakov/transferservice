@@ -1,13 +1,10 @@
-package paveljakov.transfer.dto;
-
-import java.util.UUID;
+package paveljakov.transfer.dto.account;
 
 import lombok.Data;
 
 @Data
-public class AccountDto {
+public class CreateAccountDto {
 
-    private String id;
     private String firstName;
     private String lastName;
     private String email;

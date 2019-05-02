@@ -1,5 +1,7 @@
 package paveljakov.transfer.repository.wallet;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +14,11 @@ import org.codejargon.fluentjdbc.api.query.Query;
 import org.simpleflatmapper.jdbc.JdbcMapper;
 import org.simpleflatmapper.jdbc.JdbcMapperFactory;
 
-import paveljakov.transfer.dto.WalletDto;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletDto;
+import paveljakov.transfer.dto.wallet.WalletStatus;
+import paveljakov.transfer.repository.WalletQueries;
 
 @Singleton
 public class WalletRepositoryImpl implements WalletRepository {
@@ -34,7 +40,7 @@ public class WalletRepositoryImpl implements WalletRepository {
         }
 
         try {
-            return jdbc.select("SELECT * FROM WALLET WHERE ID = :id")
+            return jdbc.select(WalletQueries.FIND_BY_ID)
                     .namedParam("id", id)
                     .firstResult(MAPPER::map);
 
@@ -49,18 +55,26 @@ public class WalletRepositoryImpl implements WalletRepository {
             throw new IllegalArgumentException("Parameter accountId is mandatory!");
         }
 
-        return jdbc.select("SELECT WLT.ID, WLT.ACCOUNT_ID, WLT.STATUS, WLT.CREATION_DATE, WLT.BALANCE, WLT.BALANCE_AVAILABLE, WLT.CURRENCY "
-                                   + "FROM WALLET WLT JOIN ACCOUNT ACC ON WLT.ACCOUNT_ID = ACC.ID WHERE ACC.ID = :accountId")
+        return jdbc.select(WalletQueries.FIND_BY_ACCOUNT)
                 .namedParam("accountId", accountId)
                 .listResult(MAPPER::map);
     }
 
     @Override
-    public Optional<String> insert(final WalletDto walletDto) {
-        if (walletDto == null) {
-            throw new IllegalArgumentException("Parameter walletDto is mandatory!");
+    public Optional<EntityIdResponseDto> insert(final CreateWalletDto dto, final String accountId) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Parameter dto is mandatory!");
         }
 
-        return Optional.empty();
+        return jdbc.update(WalletQueries.INSERT)
+                .namedParam("accountId", accountId)
+                .namedParam("status", WalletStatus.ACTIVE)
+                .namedParam("creationDate", LocalDateTime.now())
+                .namedParam("balance", BigDecimal.valueOf(0))
+                .namedParam("balanceAvailable", BigDecimal.valueOf(0))
+                .namedParam("currency", dto.getCurrency())
+                .runFetchGenKeys(rs -> rs.getString("ID"), new String[] {"ID"})
+                .firstKey()
+                .map(EntityIdResponseDto::new);
     }
 }

@@ -21,8 +21,9 @@ import dagger.multibindings.Multibinds;
 import paveljakov.transfer.rest.controller.AccountController;
 import paveljakov.transfer.rest.controller.RestController;
 import paveljakov.transfer.rest.controller.WalletController;
+import paveljakov.transfer.rest.error.CliantErrorExceptionHandler;
+import paveljakov.transfer.rest.error.ElementNotFoundExceptionHandler;
 import paveljakov.transfer.rest.error.GlobalExceptionHandler;
-import paveljakov.transfer.rest.error.NoSuchElementExceptionHandler;
 import spark.ExceptionHandler;
 
 @Module
@@ -32,7 +33,7 @@ public abstract class RestModule {
     abstract Set<RestController> providesControllers();
 
     @Multibinds
-    abstract Map<Class<?>, ExceptionHandler> providesExceptionHandlers();
+    abstract Map<Class<? extends Exception>, ExceptionHandler<Exception>> providesExceptionHandlers();
 
     @Binds
     @IntoSet
@@ -45,12 +46,17 @@ public abstract class RestModule {
     @Binds
     @IntoMap
     @ExceptionType(Exception.class)
-    abstract ExceptionHandler bindGlobalExceptionHandler(GlobalExceptionHandler exceptionHandler);
+    abstract ExceptionHandler<Exception> bindGlobalExceptionHandler(GlobalExceptionHandler exceptionHandler);
 
     @Binds
     @IntoMap
     @ExceptionType(NoSuchElementException.class)
-    abstract ExceptionHandler bindNoSuchElementExceptionHandler(NoSuchElementExceptionHandler exceptionHandler);
+    abstract ExceptionHandler<Exception> bindNoSuchElementExceptionHandler(ElementNotFoundExceptionHandler exceptionHandler);
+
+    @Binds
+    @IntoMap
+    @ExceptionType(IllegalArgumentException.class)
+    abstract ExceptionHandler<Exception> bindIllegalArgumentExceptionHandler(CliantErrorExceptionHandler exceptionHandler);
 
     @Provides
     @Singleton

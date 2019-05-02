@@ -3,7 +3,9 @@ package paveljakov.transfer.repository.wallet;
 import java.util.List;
 import java.util.Optional;
 
-import paveljakov.transfer.dto.WalletDto;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletDto;
 
 public interface WalletRepository {
 
@@ -11,6 +13,6 @@ public interface WalletRepository {
 
     List<WalletDto> findByAccount(String accountId);
 
-    Optional<String> insert(WalletDto walletDto);
+    Optional<EntityIdResponseDto> insert(CreateWalletDto dto, String accountId);
 
 }

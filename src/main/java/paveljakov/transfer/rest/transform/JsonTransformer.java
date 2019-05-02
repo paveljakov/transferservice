@@ -1,5 +1,7 @@
 package paveljakov.transfer.rest.transform;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -27,6 +29,15 @@ public class JsonTransformer implements ResponseTransformer {
 
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    public <T> T deserialize(final String json, final Class<T> type) {
+        try {
+            return objectMapper.readValue(json, type);
+
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

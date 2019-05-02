@@ -1,4 +1,4 @@
-package paveljakov.transfer.dto;
+package paveljakov.transfer.dto.wallet;
 
 public enum WalletStatus {
 

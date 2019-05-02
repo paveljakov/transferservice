@@ -14,12 +14,12 @@ import spark.Response;
 
 @Slf4j
 @Singleton
-public class NoSuchElementExceptionHandler implements ExceptionHandler {
+public class ElementNotFoundExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 
     @Inject
-    public NoSuchElementExceptionHandler(final ObjectMapper objectMapper) {
+    public ElementNotFoundExceptionHandler(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

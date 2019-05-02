@@ -5,7 +5,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import paveljakov.transfer.dto.AccountDto;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.account.AccountDto;
+import paveljakov.transfer.dto.account.CreateAccountDto;
 import paveljakov.transfer.repository.account.AccountRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
 import spark.Request;
@@ -28,6 +30,7 @@ public class AccountController implements RestController {
     @Override
     public void configureRoutes(final Service service) {
         service.get("/accounts", this::getAccounts, jsonTransformer);
+        service.put("/accounts", this::insertAccount, jsonTransformer);
         service.get("/accounts/:id", this::getAccount, jsonTransformer);
     }
 
@@ -38,6 +41,13 @@ public class AccountController implements RestController {
     private AccountDto getAccount(final Request request, final Response response) {
         return accountRepository.find(request.params("id"))
                 .orElseThrow();
+    }
+
+    private EntityIdResponseDto insertAccount(final Request request, final Response response) {
+        final CreateAccountDto dto = jsonTransformer.deserialize(request.body(), CreateAccountDto.class);
+
+        return accountRepository.insert(dto)
+                .orElseThrow(IllegalStateException::new);
     }
 
 }

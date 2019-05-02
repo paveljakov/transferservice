@@ -5,8 +5,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import paveljakov.transfer.dto.AccountDto;
-import paveljakov.transfer.dto.WalletDto;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletDto;
 import paveljakov.transfer.repository.wallet.WalletRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
 import spark.Request;
@@ -28,8 +29,9 @@ public class WalletController implements RestController {
 
     @Override
     public void configureRoutes(final Service service) {
-        service.get("/wallet/:id", this::getWallet, jsonTransformer);
+        service.get("/wallets/:id", this::getWallet, jsonTransformer);
         service.get("/accounts/:accountId/wallets", this::getWalletsForUser, jsonTransformer);
+        service.put("/accounts/:accountId/wallets", this::insertWallet, jsonTransformer);
     }
 
     private WalletDto getWallet(final Request request, final Response response) {
@@ -39,6 +41,13 @@ public class WalletController implements RestController {
 
     private List<WalletDto> getWalletsForUser(final Request request, final Response response) {
         return walletRepository.findByAccount(request.params("accountId"));
+    }
+
+    private EntityIdResponseDto insertWallet(final Request request, final Response response) {
+        final CreateWalletDto dto = jsonTransformer.deserialize(request.body(), CreateWalletDto.class);
+
+        return walletRepository.insert(dto, request.params("accountId"))
+                .orElseThrow(IllegalStateException::new);
     }
 
 }

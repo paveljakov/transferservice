@@ -23,11 +23,11 @@ public class RestService {
 
     private final Set<RestController> controllers;
 
-    private final Map<Class<? extends Exception>, ExceptionHandler> exceptionHandlers;
+    private final Map<Class<? extends Exception>, ExceptionHandler<Exception>> exceptionHandlers;
 
     @Inject
     public RestService(final Service service, final Set<RestController> controllers,
-                       final Map<Class<? extends Exception>, ExceptionHandler> exceptionHandlers) {
+                       final Map<Class<? extends Exception>, ExceptionHandler<Exception>> exceptionHandlers) {
 
         this.service = service;
         this.controllers = controllers;

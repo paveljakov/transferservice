@@ -123,6 +123,25 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
             </plugin>
+            <plugin>
+                <groupId>com.github.paveljakov</groupId>
+                <artifactId>queryless-plugin-maven</artifactId>
+                <version>1.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sources>
+                                <param>db/queries/*.sql</param>
+                            </sources>
+                            <packageName>paveljakov.transfer.repository</packageName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
