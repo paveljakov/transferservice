@@ -4,7 +4,16 @@ SELECT
 FROM
     WALLET
 WHERE
-      ID = :id;
+    ID = :id;
+
+-- id: lock-by-id
+SELECT
+    *
+FROM
+    WALLET
+WHERE
+    ID = :id
+FOR UPDATE;
 
 -- id: find-by-account
 SELECT
@@ -40,3 +49,12 @@ VALUES (
     :balanceAvailable,
     :currency
 );
+
+-- id: update
+UPDATE
+    WALLET
+SET
+    BALANCE = :balance,
+    BALANCE_AVAILABLE = :balanceAvailable
+WHERE
+    ID = :id;

@@ -14,7 +14,7 @@ import spark.Response;
 
 @Slf4j
 @Singleton
-public class ElementNotFoundExceptionHandler implements ExceptionHandler<Exception> {
+class ElementNotFoundExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 

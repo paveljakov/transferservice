@@ -1,0 +1,9 @@
+{
+  "id" : "d2410f40-f9fd-40c5-8902-ea3ede77c7cd",
+  "accountId" : "33d7199f-0e9d-4bd0-baff-2087c3a6f152",
+  "status" : "ACTIVE",
+  "creationDate" : "2019-04-27T22:20:59.123",
+  "balance" : 99.99,
+  "balanceAvailable" : 99.99,
+  "currency" : "EUR"
+}

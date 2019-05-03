@@ -14,7 +14,7 @@ import spark.Response;
 
 @Slf4j
 @Singleton
-public class ClientErrorExceptionHandler implements ExceptionHandler<Exception> {
+class ClientErrorExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 
@@ -30,7 +30,7 @@ public class ClientErrorExceptionHandler implements ExceptionHandler<Exception> 
             response.type(CommonConstants.JSON_TYPE);
             response.body(objectMapper
                                   .writerWithDefaultPrettyPrinter()
-                                  .writeValueAsString(new ErrorMessage(400, "Illegal argument!")));
+                                  .writeValueAsString(new ErrorMessage(400, "Bad request!")));
 
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);

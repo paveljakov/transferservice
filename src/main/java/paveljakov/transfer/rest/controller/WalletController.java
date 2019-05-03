@@ -15,7 +15,7 @@ import spark.Response;
 import spark.Spark;
 
 @Singleton
-public class WalletController implements RestController {
+class WalletController implements RestController {
 
     private final WalletRepository walletRepository;
 
@@ -30,7 +30,7 @@ public class WalletController implements RestController {
     @Override
     public void configureRoutes() {
         Spark.get("/wallets/:id", this::getWallet, jsonTransformer);
-        Spark.get("/accounts/:accountId/wallets", this::getWalletsForUser, jsonTransformer);
+        Spark.get("/accounts/:accountId/wallets", this::getWalletsForAccount, jsonTransformer);
         Spark.put("/accounts/:accountId/wallets", this::insertWallet, jsonTransformer);
     }
 
@@ -39,7 +39,7 @@ public class WalletController implements RestController {
                 .orElseThrow();
     }
 
-    private List<WalletDto> getWalletsForUser(final Request request, final Response response) {
+    private List<WalletDto> getWalletsForAccount(final Request request, final Response response) {
         return walletRepository.findByAccount(request.params("accountId"));
     }
 

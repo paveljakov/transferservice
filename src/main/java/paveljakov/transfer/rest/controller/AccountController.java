@@ -15,7 +15,7 @@ import spark.Response;
 import spark.Spark;
 
 @Singleton
-public class AccountController implements RestController {
+class AccountController implements RestController {
 
     private final AccountRepository accountRepository;
 

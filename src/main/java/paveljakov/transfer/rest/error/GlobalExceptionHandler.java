@@ -14,7 +14,7 @@ import spark.Response;
 
 @Slf4j
 @Singleton
-public class GlobalExceptionHandler implements ExceptionHandler<Exception> {
+class GlobalExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 

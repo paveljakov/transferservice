@@ -4,7 +4,7 @@ SELECT
 FROM
     ACCOUNT
 WHERE
-      ID = :id;
+    ID = :id;
 
 -- id: find-all
 SELECT

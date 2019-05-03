@@ -4,6 +4,8 @@ import dagger.Binds;
 import dagger.Module;
 import paveljakov.transfer.repository.account.AccountRepository;
 import paveljakov.transfer.repository.account.AccountRepositoryImpl;
+import paveljakov.transfer.repository.transaction.TransactionRepository;
+import paveljakov.transfer.repository.transaction.TransactionRepositoryImpl;
 import paveljakov.transfer.repository.wallet.WalletRepository;
 import paveljakov.transfer.repository.wallet.WalletRepositoryImpl;
 
@@ -15,5 +17,8 @@ public abstract class RepositoryModule {
 
     @Binds
     abstract WalletRepository bindWalletRepository(WalletRepositoryImpl walletRepository);
+
+    @Binds
+    abstract TransactionRepository bindTransactionRepository(TransactionRepositoryImpl transactionRepository);
 
 }
