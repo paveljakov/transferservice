@@ -12,7 +12,7 @@ import paveljakov.transfer.repository.account.AccountRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
 import spark.Request;
 import spark.Response;
-import spark.Service;
+import spark.Spark;
 
 @Singleton
 public class AccountController implements RestController {
@@ -28,10 +28,10 @@ public class AccountController implements RestController {
     }
 
     @Override
-    public void configureRoutes(final Service service) {
-        service.get("/accounts", this::getAccounts, jsonTransformer);
-        service.put("/accounts", this::insertAccount, jsonTransformer);
-        service.get("/accounts/:id", this::getAccount, jsonTransformer);
+    public void configureRoutes() {
+        Spark.get("/accounts", this::getAccounts, jsonTransformer);
+        Spark.put("/accounts", this::insertAccount, jsonTransformer);
+        Spark.get("/accounts/:id", this::getAccount, jsonTransformer);
     }
 
     private List<AccountDto> getAccounts(final Request request, final Response response) {

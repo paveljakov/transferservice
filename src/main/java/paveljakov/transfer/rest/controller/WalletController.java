@@ -12,7 +12,7 @@ import paveljakov.transfer.repository.wallet.WalletRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
 import spark.Request;
 import spark.Response;
-import spark.Service;
+import spark.Spark;
 
 @Singleton
 public class WalletController implements RestController {
@@ -28,10 +28,10 @@ public class WalletController implements RestController {
     }
 
     @Override
-    public void configureRoutes(final Service service) {
-        service.get("/wallets/:id", this::getWallet, jsonTransformer);
-        service.get("/accounts/:accountId/wallets", this::getWalletsForUser, jsonTransformer);
-        service.put("/accounts/:accountId/wallets", this::insertWallet, jsonTransformer);
+    public void configureRoutes() {
+        Spark.get("/wallets/:id", this::getWallet, jsonTransformer);
+        Spark.get("/accounts/:accountId/wallets", this::getWalletsForUser, jsonTransformer);
+        Spark.put("/accounts/:accountId/wallets", this::insertWallet, jsonTransformer);
     }
 
     private WalletDto getWallet(final Request request, final Response response) {

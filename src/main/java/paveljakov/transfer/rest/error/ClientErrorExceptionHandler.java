@@ -14,12 +14,12 @@ import spark.Response;
 
 @Slf4j
 @Singleton
-public class CliantErrorExceptionHandler implements ExceptionHandler<Exception> {
+public class ClientErrorExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 
     @Inject
-    public CliantErrorExceptionHandler(final ObjectMapper objectMapper) {
+    public ClientErrorExceptionHandler(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

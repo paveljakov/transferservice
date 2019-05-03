@@ -1,15 +1,14 @@
 package paveljakov.transfer.config;
 
-public interface Configuration {
+import lombok.Data;
 
-    int getServerPort();
+@Data
+public class Configuration {
 
-    String getJdbcDriver();
-
-    String getJdbcUrl();
-
-    String getJdbcUser();
-
-    String getJdbcPasswd();
+    private final int serverPort;
+    private final String jdbcDriver;
+    private final String jdbcUrl;
+    private final String jdbcUser;
+    private final String jdbcPasswd;
 
 }

@@ -1,7 +1,6 @@
 package paveljakov.transfer.rest;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -9,39 +8,44 @@ import javax.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 import paveljakov.transfer.common.CommonConstants;
+import paveljakov.transfer.config.Configuration;
 import paveljakov.transfer.rest.controller.RestController;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
-import spark.Service;
+import spark.Spark;
 
 @Slf4j
 @Singleton
 public class RestService {
 
-    private final Service service;
-
     private final Set<RestController> controllers;
 
     private final Map<Class<? extends Exception>, ExceptionHandler<Exception>> exceptionHandlers;
 
+    private final Configuration configuration;
+
     @Inject
-    public RestService(final Service service, final Set<RestController> controllers,
+    public RestService(final Set<RestController> controllers, final Configuration configuration,
                        final Map<Class<? extends Exception>, ExceptionHandler<Exception>> exceptionHandlers) {
 
-        this.service = service;
         this.controllers = controllers;
         this.exceptionHandlers = exceptionHandlers;
+        this.configuration = configuration;
     }
 
     public void start() {
-        exceptionHandlers.forEach(service::exception);
+        Spark.port(configuration.getServerPort());
 
-        controllers.forEach(rest -> rest.configureRoutes(service));
+        Spark.init();
 
-        service.notFound(this::notFound);
+        exceptionHandlers.forEach(Spark::exception);
 
-        service.after((req, resp) -> resp.type(CommonConstants.JSON_TYPE));
+        controllers.forEach(RestController::configureRoutes);
+
+        Spark.notFound(this::notFound);
+
+        Spark.after((req, resp) -> resp.type(CommonConstants.JSON_TYPE));
     }
 
     private Object notFound(final Request request, final Response response) {
