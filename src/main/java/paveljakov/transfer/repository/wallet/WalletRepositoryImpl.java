@@ -15,7 +15,7 @@ import org.simpleflatmapper.jdbc.JdbcMapper;
 import org.simpleflatmapper.jdbc.JdbcMapperFactory;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
-import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
 import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
 import paveljakov.transfer.dto.wallet.WalletStatus;
@@ -63,7 +63,7 @@ public class WalletRepositoryImpl implements WalletRepository {
     }
 
     @Override
-    public Optional<EntityIdResponseDto> insert(final CreateWalletDto dto, final String accountId) {
+    public Optional<EntityIdResponseDto> insert(final WalletCreateDto dto, final String accountId) {
         if (dto == null) {
             throw new IllegalArgumentException("Parameter dto is mandatory!");
         }

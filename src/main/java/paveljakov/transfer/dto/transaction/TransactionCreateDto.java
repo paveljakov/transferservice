@@ -2,10 +2,14 @@ package paveljakov.transfer.dto.transaction;
 
 import java.math.BigDecimal;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class NewTransactionDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class TransactionCreateDto {
 
     private String senderWalletId;
     private String receiverWalletId;

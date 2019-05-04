@@ -7,7 +7,7 @@ import javax.inject.Singleton;
 
 import paveljakov.transfer.common.CommonConstants;
 import paveljakov.transfer.dto.EntityIdResponseDto;
-import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
 import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
 import paveljakov.transfer.repository.wallet.WalletRepository;
@@ -55,7 +55,7 @@ class WalletController implements RestController {
     }
 
     private EntityIdResponseDto insertWallet(final Request request, final Response response) {
-        final CreateWalletDto dto = jsonTransformer.deserialize(request.body(), CreateWalletDto.class);
+        final WalletCreateDto dto = jsonTransformer.deserialize(request.body(), WalletCreateDto.class);
 
         return walletRepository.insert(dto, request.params("accountId"))
                 .orElseThrow(IllegalStateException::new);

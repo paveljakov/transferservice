@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.account.AccountDto;
-import paveljakov.transfer.dto.account.CreateAccountDto;
+import paveljakov.transfer.dto.account.AccountCreateDto;
 
 public interface AccountRepository {
 
@@ -13,6 +13,6 @@ public interface AccountRepository {
 
     List<AccountDto> findAll();
 
-    Optional<EntityIdResponseDto> insert(CreateAccountDto dto);
+    Optional<EntityIdResponseDto> insert(AccountCreateDto dto);
 
 }

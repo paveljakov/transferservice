@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateWalletDto {
+public class WalletCreateDto {
 
     private Currency currency;
 

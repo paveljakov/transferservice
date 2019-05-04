@@ -5,6 +5,7 @@ import static paveljakov.transfer.DaggerApplication.builder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -33,7 +34,13 @@ import spark.Spark;
 @Getter
 public abstract class IntegrationTestsBase {
 
-    private final HttpClient http = HttpClientBuilder.create().build();
+    protected static String databaseName;
+
+    private final HttpClient http = HttpClientBuilder.create()
+            .setConnectionTimeToLive(10, TimeUnit.SECONDS)
+            .setMaxConnTotal(10)
+            .setMaxConnPerRoute(10)
+            .build();
 
     private final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -45,7 +52,7 @@ public abstract class IntegrationTestsBase {
         final Configuration cfg = new Configuration(
                 8080,
                 "org.h2.Driver",
-                "jdbc:h2:mem:transferdb",
+                "jdbc:h2:mem:" + databaseName,
                 "sa",
                 null
         );

@@ -8,7 +8,7 @@ import javax.inject.Singleton;
 import paveljakov.transfer.common.CommonConstants;
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.account.AccountDto;
-import paveljakov.transfer.dto.account.CreateAccountDto;
+import paveljakov.transfer.dto.account.AccountCreateDto;
 import paveljakov.transfer.repository.account.AccountRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
 import spark.Request;
@@ -45,7 +45,7 @@ class AccountController implements RestController {
     }
 
     private EntityIdResponseDto insertAccount(final Request request, final Response response) {
-        final CreateAccountDto dto = jsonTransformer.deserialize(request.body(), CreateAccountDto.class);
+        final AccountCreateDto dto = jsonTransformer.deserialize(request.body(), AccountCreateDto.class);
 
         return accountRepository.insert(dto)
                 .orElseThrow(IllegalStateException::new);

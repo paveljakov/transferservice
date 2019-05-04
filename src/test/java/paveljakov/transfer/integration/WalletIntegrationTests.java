@@ -17,12 +17,16 @@ import org.assertj.core.util.Objects;
 import org.junit.Test;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
-import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
 import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
 import paveljakov.transfer.dto.wallet.WalletStatus;
 
 public class WalletIntegrationTests extends IntegrationTestsBase {
+
+    static {
+        databaseName = "walletIntegrationTests";
+    }
 
     @Test
     public void testGetWallet() throws IOException {
@@ -118,7 +122,7 @@ public class WalletIntegrationTests extends IntegrationTestsBase {
         // Given
         final Currency newCurrency = Currency.getInstance("USD");
 
-        final CreateWalletDto requestDto = new CreateWalletDto(
+        final WalletCreateDto requestDto = new WalletCreateDto(
                 newCurrency
         );
 

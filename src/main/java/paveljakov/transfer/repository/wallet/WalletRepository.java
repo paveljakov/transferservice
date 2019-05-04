@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
-import paveljakov.transfer.dto.wallet.CreateWalletDto;
+import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
 
@@ -14,7 +14,7 @@ public interface WalletRepository {
 
     List<WalletDto> findByAccount(String accountId);
 
-    Optional<EntityIdResponseDto> insert(CreateWalletDto dto, String accountId);
+    Optional<EntityIdResponseDto> insert(WalletCreateDto dto, String accountId);
 
     void addAmount(String id, WalletMonetaryAmountDto dto);
 

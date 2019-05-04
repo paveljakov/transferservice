@@ -5,6 +5,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import paveljakov.transfer.common.CommonConstants;
+import paveljakov.transfer.dto.EntityIdResponseDto;
+import paveljakov.transfer.dto.transaction.TransactionCreateDto;
 import paveljakov.transfer.dto.transaction.TransactionDto;
 import paveljakov.transfer.repository.transaction.TransactionRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
@@ -27,9 +30,23 @@ class TransactionController implements RestController {
 
     @Override
     public void configureRoutes() {
+        Spark.put("/transactions", CommonConstants.JSON_TYPE, this::newTransaction, jsonTransformer);
         Spark.get("/transactions/:id", this::getTransaction, jsonTransformer);
         Spark.get("/wallets/:walletId/transactions", this::getTransactionForWallet, jsonTransformer);
         Spark.get("/accounts/:accountId/transactions", this::getTransactionForAccount, jsonTransformer);
+    }
+
+    private EntityIdResponseDto newTransaction(final Request request, final Response response) {
+        final TransactionCreateDto dto = jsonTransformer.deserialize(request.body(), TransactionCreateDto.class);
+
+        final EntityIdResponseDto transactionId = transactionRepository.create(dto)
+                .orElseThrow();
+
+        transactionRepository.authorize(transactionId.getId());
+
+        transactionRepository.capture(transactionId.getId());
+
+        return transactionId;
     }
 
     private TransactionDto getTransaction(final Request request, final Response response) {

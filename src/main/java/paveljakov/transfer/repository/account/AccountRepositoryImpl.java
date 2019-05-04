@@ -14,7 +14,7 @@ import org.simpleflatmapper.jdbc.JdbcMapperFactory;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.account.AccountDto;
-import paveljakov.transfer.dto.account.CreateAccountDto;
+import paveljakov.transfer.dto.account.AccountCreateDto;
 import paveljakov.transfer.repository.AccountQueries;
 
 @Singleton
@@ -53,7 +53,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Optional<EntityIdResponseDto> insert(final CreateAccountDto dto) {
+    public Optional<EntityIdResponseDto> insert(final AccountCreateDto dto) {
         if (dto == null) {
             throw new IllegalArgumentException("Parameter dto is mandatory!");
         }

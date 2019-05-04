@@ -16,9 +16,13 @@ import org.junit.Test;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.account.AccountDto;
-import paveljakov.transfer.dto.account.CreateAccountDto;
+import paveljakov.transfer.dto.account.AccountCreateDto;
 
 public class AccountIntegrationTests extends IntegrationTestsBase {
+
+    static {
+        databaseName = "accountIntegrationTests";
+    }
 
     @Test
     public void testGetAccount() throws IOException {
@@ -66,7 +70,7 @@ public class AccountIntegrationTests extends IntegrationTestsBase {
         final String newLastName = "User3";
         final String newEmail = "sample.user3@none.com";
 
-        final CreateAccountDto requestDto = new CreateAccountDto(
+        final AccountCreateDto requestDto = new AccountCreateDto(
                 newFirstName,
                 newLastName,
                 newEmail

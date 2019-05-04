@@ -4,6 +4,7 @@ public enum TransactionStatus {
 
     PENDING,
     AUTHORIZED,
-    CONFIRMED;
+    CONFIRMED,
+    CANCELED;
 
 }
