@@ -85,7 +85,7 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .namedParam("senderWalletId", dto.getSenderWalletId())
                 .namedParam("receiverWalletId", dto.getReceiverWalletId())
                 .namedParam("amount", dto.getAmount())
-                .namedParam("authorizedAmount", BigDecimal.valueOf(0))
+                .namedParam("authorizedAmount", null)
                 .runFetchGenKeys(rs -> rs.getString("ID"), new String[] {"ID"})
                 .firstKey()
                 .map(EntityIdResponseDto::new);

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import paveljakov.transfer.common.CommonConstants;
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.account.AccountDto;
 import paveljakov.transfer.dto.account.CreateAccountDto;
@@ -30,7 +31,7 @@ class AccountController implements RestController {
     @Override
     public void configureRoutes() {
         Spark.get("/accounts", this::getAccounts, jsonTransformer);
-        Spark.put("/accounts", this::insertAccount, jsonTransformer);
+        Spark.put("/accounts", CommonConstants.JSON_TYPE, this::insertAccount, jsonTransformer);
         Spark.get("/accounts/:id", this::getAccount, jsonTransformer);
     }
 

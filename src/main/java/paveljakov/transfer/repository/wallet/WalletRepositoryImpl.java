@@ -74,7 +74,7 @@ public class WalletRepositoryImpl implements WalletRepository {
                 .namedParam("creationDate", LocalDateTime.now())
                 .namedParam("balance", BigDecimal.valueOf(0))
                 .namedParam("balanceAvailable", BigDecimal.valueOf(0))
-                .namedParam("currency", dto.getCurrency())
+                .namedParam("currency", dto.getCurrency().getCurrencyCode())
                 .runFetchGenKeys(rs -> rs.getString("ID"), new String[] {"ID"})
                 .firstKey()
                 .map(EntityIdResponseDto::new);
