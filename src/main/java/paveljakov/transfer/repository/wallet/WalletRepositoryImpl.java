@@ -17,7 +17,6 @@ import org.simpleflatmapper.jdbc.JdbcMapperFactory;
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
-import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
 import paveljakov.transfer.dto.wallet.WalletStatus;
 import paveljakov.transfer.dto.wallet.WalletUpdateDto;
 import paveljakov.transfer.repository.WalletQueries;
@@ -52,6 +51,13 @@ public class WalletRepositoryImpl implements WalletRepository {
     }
 
     @Override
+    public WalletDto lock(final String id) {
+        return jdbc.select(WalletQueries.LOCK_BY_ID)
+                .namedParam("id", id)
+                .singleResult(MAPPER::map);
+    }
+
+    @Override
     public List<WalletDto> findByAccount(final String accountId) {
         if (StringUtils.isBlank(accountId)) {
             throw new IllegalArgumentException("Parameter accountId is mandatory!");
@@ -81,131 +87,16 @@ public class WalletRepositoryImpl implements WalletRepository {
     }
 
     @Override
-    public void addAmount(final String id, final WalletMonetaryAmountDto dto) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("Parameter id is mandatory!");
+    public void update(final WalletUpdateDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Parameter dto is mandatory!");
         }
-
-        validateMonetaryAmountDto(dto);
-
-        jdbc.transaction().inNoResult(() -> {
-            final WalletDto wallet = lock(id);
-
-            final WalletUpdateDto updateDto = new WalletUpdateDto(
-                    id,
-                    wallet.getBalance().add(dto.getAmount()),
-                    wallet.getBalanceAvailable().add(dto.getAmount())
-            );
-
-            update(updateDto);
-        });
-    }
-
-    @Override
-    public void authorizeAmount(final String id, final WalletMonetaryAmountDto dto) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("Parameter id is mandatory!");
-        }
-
-        validateMonetaryAmountDto(dto);
-
-        jdbc.transaction().inNoResult(() -> {
-            final WalletDto wallet = lock(id);
-
-            final WalletUpdateDto updateDto = new WalletUpdateDto(
-                    id,
-                    wallet.getBalance(),
-                    wallet.getBalanceAvailable().subtract(dto.getAmount())
-            );
-
-            update(updateDto);
-        });
-    }
-
-    @Override
-    public void unauthorizeAmount(final String id, final WalletMonetaryAmountDto dto) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("Parameter id is mandatory!");
-        }
-
-        validateMonetaryAmountDto(dto);
-
-        jdbc.transaction().inNoResult(() -> {
-            final WalletDto wallet = lock(id);
-
-            final WalletUpdateDto updateDto = new WalletUpdateDto(
-                    id,
-                    wallet.getBalance(),
-                    wallet.getBalanceAvailable().add(dto.getAmount())
-            );
-
-            update(updateDto);
-        });
-    }
-
-    @Override
-    public void captureAmount(final String id, final WalletMonetaryAmountDto dto) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("Parameter id is mandatory!");
-        }
-
-        validateMonetaryAmountDto(dto);
-
-        jdbc.transaction().inNoResult(() -> {
-            final WalletDto wallet = lock(id);
-
-            final WalletUpdateDto updateDto = new WalletUpdateDto(
-                    id,
-                    wallet.getBalance().subtract(dto.getAmount()),
-                    wallet.getBalanceAvailable()
-            );
-
-            update(updateDto);
-        });
-    }
-
-    private WalletDto lock(final String id) {
-        return jdbc.select(WalletQueries.LOCK_BY_ID)
-                .namedParam("id", id)
-                .firstResult(MAPPER::map)
-                .orElseThrow();
-    }
-
-    private void update(final WalletUpdateDto dto) {
-        validateWalletUpdateDto(dto);
 
         jdbc.update(WalletQueries.UPDATE)
                 .namedParam("id", dto.getId())
                 .namedParam("balance", dto.getNewBalance())
                 .namedParam("balanceAvailable", dto.getNewBalanceAvailable())
                 .run();
-    }
-
-    private void validateMonetaryAmountDto(final WalletMonetaryAmountDto dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("Parameter dto is mandatory!");
-        }
-        if (dto.getAmount() == null) {
-            throw new IllegalArgumentException("Parameter dto.amount is mandatory!");
-        }
-        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Parameter dto.amount must be positive!");
-        }
-    }
-
-    private void validateWalletUpdateDto(final WalletUpdateDto dto) {
-        if (dto == null) {
-            throw new IllegalArgumentException("Parameter dto is mandatory!");
-        }
-        if (StringUtils.isBlank(dto.getId())) {
-            throw new IllegalArgumentException("Parameter dto.id is mandatory!");
-        }
-        if (dto.getNewBalance().compareTo(BigDecimal.ZERO) < 0) {
-            throw new WalletOperationException("Non-sufficient funds!");
-        }
-        if (dto.getNewBalanceAvailable().compareTo(BigDecimal.ZERO) < 0) {
-            throw new WalletOperationException("Non-sufficient funds!");
-        }
     }
 
 }

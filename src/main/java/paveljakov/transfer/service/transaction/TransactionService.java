@@ -1,4 +1,4 @@
-package paveljakov.transfer.repository.transaction;
+package paveljakov.transfer.service.transaction;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,9 +6,8 @@ import java.util.Optional;
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.transaction.TransactionCreateDto;
 import paveljakov.transfer.dto.transaction.TransactionDto;
-import paveljakov.transfer.dto.transaction.TransactionUpdateDto;
 
-public interface TransactionRepository {
+public interface TransactionService {
 
     Optional<TransactionDto> find(String id);
 
@@ -16,10 +15,14 @@ public interface TransactionRepository {
 
     List<TransactionDto> findByAccount(String accountId);
 
+    Optional<EntityIdResponseDto> transfer(TransactionCreateDto dto);
+
     Optional<EntityIdResponseDto> create(TransactionCreateDto dto);
 
-    TransactionDto lock(String id);
+    void authorize(String id);
 
-    void update(TransactionUpdateDto dto);
+    void capture(String id);
+
+    void cancel(final String id);
 
 }

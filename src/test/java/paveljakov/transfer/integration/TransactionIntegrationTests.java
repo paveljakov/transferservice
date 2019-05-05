@@ -212,7 +212,7 @@ public class TransactionIntegrationTests extends IntegrationTestsBase {
         final HttpResponse receiverWalletResponse = getHttp().execute(receiverWalletRequest);
 
         // Then
-        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
         assertThat(receiverWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
         final WalletDto receiverWallet = deserializeResponseJson(receiverWalletResponse, WalletDto.class);
@@ -242,7 +242,7 @@ public class TransactionIntegrationTests extends IntegrationTestsBase {
         final HttpResponse senderWalletResponse = getHttp().execute(senderWalletRequest);
 
         // Then
-        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
         assertThat(senderWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
         final WalletDto senderWallet = deserializeResponseJson(senderWalletResponse, WalletDto.class);

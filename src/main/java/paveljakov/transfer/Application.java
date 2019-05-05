@@ -10,9 +10,10 @@ import paveljakov.transfer.config.Configuration;
 import paveljakov.transfer.persistence.PersistenceModule;
 import paveljakov.transfer.repository.RepositoryModule;
 import paveljakov.transfer.rest.RestModule;
+import paveljakov.transfer.service.ServiceModule;
 
 @Singleton
-@Component(modules = {AppModule.class, RestModule.class, RepositoryModule.class, PersistenceModule.class})
+@Component(modules = {AppModule.class, RestModule.class, ServiceModule.class, RepositoryModule.class, PersistenceModule.class})
 public interface Application {
 
     AppService appService();

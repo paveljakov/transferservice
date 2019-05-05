@@ -9,8 +9,8 @@ import paveljakov.transfer.common.CommonConstants;
 import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.transaction.TransactionCreateDto;
 import paveljakov.transfer.dto.transaction.TransactionDto;
-import paveljakov.transfer.repository.transaction.TransactionRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
+import paveljakov.transfer.service.transaction.TransactionService;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -18,13 +18,13 @@ import spark.Spark;
 @Singleton
 class TransactionController implements RestController {
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     private final JsonTransformer jsonTransformer;
 
     @Inject
-    public TransactionController(final TransactionRepository transactionRepository, final JsonTransformer jsonTransformer) {
-        this.transactionRepository = transactionRepository;
+    public TransactionController(final TransactionService transactionService, final JsonTransformer jsonTransformer) {
+        this.transactionService = transactionService;
         this.jsonTransformer = jsonTransformer;
     }
 
@@ -39,27 +39,21 @@ class TransactionController implements RestController {
     private EntityIdResponseDto newTransaction(final Request request, final Response response) {
         final TransactionCreateDto dto = jsonTransformer.deserialize(request.body(), TransactionCreateDto.class);
 
-        final EntityIdResponseDto transactionId = transactionRepository.create(dto)
+        return transactionService.transfer(dto)
                 .orElseThrow();
-
-        transactionRepository.authorize(transactionId.getId());
-
-        transactionRepository.capture(transactionId.getId());
-
-        return transactionId;
     }
 
     private TransactionDto getTransaction(final Request request, final Response response) {
-        return transactionRepository.find(request.params("id"))
+        return transactionService.find(request.params("id"))
                 .orElseThrow();
     }
 
     private List<TransactionDto> getTransactionForWallet(final Request request, final Response response) {
-        return transactionRepository.findByWallet(request.params("walletId"));
+        return transactionService.findByWallet(request.params("walletId"));
     }
 
     private List<TransactionDto> getTransactionForAccount(final Request request, final Response response) {
-        return transactionRepository.findByAccount(request.params("accountId"));
+        return transactionService.findByAccount(request.params("accountId"));
     }
 
 }

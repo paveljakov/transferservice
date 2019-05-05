@@ -10,8 +10,8 @@ import paveljakov.transfer.dto.EntityIdResponseDto;
 import paveljakov.transfer.dto.wallet.WalletCreateDto;
 import paveljakov.transfer.dto.wallet.WalletDto;
 import paveljakov.transfer.dto.wallet.WalletMonetaryAmountDto;
-import paveljakov.transfer.repository.wallet.WalletRepository;
 import paveljakov.transfer.rest.transform.JsonTransformer;
+import paveljakov.transfer.service.wallet.WalletService;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -19,13 +19,13 @@ import spark.Spark;
 @Singleton
 class WalletController implements RestController {
 
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
 
     private final JsonTransformer jsonTransformer;
 
     @Inject
-    public WalletController(final WalletRepository walletRepository, final JsonTransformer jsonTransformer) {
-        this.walletRepository = walletRepository;
+    public WalletController(final WalletService walletService, final JsonTransformer jsonTransformer) {
+        this.walletService = walletService;
         this.jsonTransformer = jsonTransformer;
     }
 
@@ -38,26 +38,26 @@ class WalletController implements RestController {
     }
 
     private WalletDto getWallet(final Request request, final Response response) {
-        return walletRepository.find(request.params("id"))
+        return walletService.find(request.params("id"))
                 .orElseThrow();
     }
 
     private Object addFunds(final Request request, final Response response) {
         final WalletMonetaryAmountDto dto = jsonTransformer.deserialize(request.body(), WalletMonetaryAmountDto.class);
 
-        walletRepository.addAmount(request.params("id"), dto);
+        walletService.addAmount(request.params("id"), dto);
 
         return null;
     }
 
     private List<WalletDto> getWalletsForAccount(final Request request, final Response response) {
-        return walletRepository.findByAccount(request.params("accountId"));
+        return walletService.findByAccount(request.params("accountId"));
     }
 
     private EntityIdResponseDto insertWallet(final Request request, final Response response) {
         final WalletCreateDto dto = jsonTransformer.deserialize(request.body(), WalletCreateDto.class);
 
-        return walletRepository.insert(dto, request.params("accountId"))
+        return walletService.insert(dto, request.params("accountId"))
                 .orElseThrow(IllegalStateException::new);
     }
 
