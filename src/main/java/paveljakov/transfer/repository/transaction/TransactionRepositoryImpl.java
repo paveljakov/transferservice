@@ -103,26 +103,15 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             throw new IllegalArgumentException("Parameter id is mandatory!");
         }
 
-        jdbc.transaction().inNoResult(() -> {
-            final TransactionDto transaction = lock(id);
+        try {
+            jdbc.transaction().inNoResult(() -> {
+                tryAuthorize(lock(id));
+            });
 
-            validateTransactionForAuthorization(transaction);
-
-            final WalletMonetaryAmountDto authorizationAmount = new WalletMonetaryAmountDto(
-                    transaction.getAmount()
-            );
-
-            final TransactionUpdateDto txUpdateDto = new TransactionUpdateDto(
-                    TransactionStatus.AUTHORIZED,
-                    null,
-                    LocalDateTime.now(),
-                    authorizationAmount.getAmount()
-            );
-
-            walletRepository.authorizeAmount(transaction.getSenderWalletId(), authorizationAmount);
-
-            update(transaction.getId(), txUpdateDto);
-        });
+        } catch (Exception e) {
+            cancel(id);
+            throw e;
+        }
     }
 
     @Override
@@ -131,26 +120,24 @@ public class TransactionRepositoryImpl implements TransactionRepository {
             throw new IllegalArgumentException("Parameter id is mandatory!");
         }
 
+        try {
+            jdbc.transaction().inNoResult(() -> {
+                tryCapture(lock(id));
+            });
+        } catch (Exception e) {
+            cancel(id);
+            throw e;
+        }
+    }
+
+    @Override
+    public void cancel(final String id) {
+        if (StringUtils.isBlank(id)) {
+            throw new IllegalArgumentException("Parameter id is mandatory!");
+        }
+
         jdbc.transaction().inNoResult(() -> {
-            final TransactionDto transaction = lock(id);
-
-            validateTransactionForCapture(transaction);
-
-            final WalletMonetaryAmountDto amount = new WalletMonetaryAmountDto(
-                    transaction.getAmount()
-            );
-
-            final TransactionUpdateDto txUpdateDto = new TransactionUpdateDto(
-                    TransactionStatus.CONFIRMED,
-                    LocalDateTime.now(),
-                    transaction.getAuthorizationDate(),
-                    transaction.getAuthorizedAmount()
-            );
-
-            walletRepository.captureAmount(transaction.getSenderWalletId(), amount);
-            walletRepository.addAmount(transaction.getReceiverWalletId(), amount);
-
-            update(transaction.getId(), txUpdateDto);
+            tryCancel(lock(id));
         });
     }
 
@@ -161,15 +148,74 @@ public class TransactionRepositoryImpl implements TransactionRepository {
                 .orElseThrow();
     }
 
-    private void update(final String id, final TransactionUpdateDto dto) {
-        if (StringUtils.isBlank(id)) {
-            throw new IllegalArgumentException("Parameter id is mandatory!");
+    private void tryAuthorize(final TransactionDto transaction) {
+        validateTransactionForAuthorization(transaction);
+
+        final WalletMonetaryAmountDto authorizationAmount = new WalletMonetaryAmountDto(
+                transaction.getAmount()
+        );
+
+        final TransactionUpdateDto txUpdateDto = new TransactionUpdateDto(
+                transaction.getId(),
+                TransactionStatus.AUTHORIZED,
+                null,
+                LocalDateTime.now(),
+                authorizationAmount.getAmount()
+        );
+
+        walletRepository.authorizeAmount(transaction.getSenderWalletId(), authorizationAmount);
+
+        update(txUpdateDto);
+    }
+
+    private void tryCapture(final TransactionDto transaction) {
+        validateTransactionForCapture(transaction);
+
+        final WalletMonetaryAmountDto amount = new WalletMonetaryAmountDto(
+                transaction.getAmount()
+        );
+
+        final TransactionUpdateDto txUpdateDto = new TransactionUpdateDto(
+                transaction.getId(),
+                TransactionStatus.CONFIRMED,
+                LocalDateTime.now(),
+                transaction.getAuthorizationDate(),
+                transaction.getAuthorizedAmount()
+        );
+
+        walletRepository.captureAmount(transaction.getSenderWalletId(), amount);
+        walletRepository.addAmount(transaction.getReceiverWalletId(), amount);
+
+        update(txUpdateDto);
+    }
+
+    private void tryCancel(final TransactionDto transaction) {
+        validateTransactionForCancel(transaction);
+
+        final TransactionUpdateDto txUpdateDto = new TransactionUpdateDto(
+                transaction.getId(),
+                TransactionStatus.CANCELED,
+                transaction.getExecutionDate(),
+                transaction.getAuthorizationDate(),
+                transaction.getAuthorizedAmount()
+        );
+
+        if (transaction.getStatus() == TransactionStatus.AUTHORIZED) {
+            final WalletMonetaryAmountDto unauthorizationAmount = new WalletMonetaryAmountDto(
+                    transaction.getAmount()
+            );
+
+            walletRepository.unauthorizeAmount(transaction.getSenderWalletId(), unauthorizationAmount);
         }
 
+        update(txUpdateDto);
+    }
+
+    private void update(final TransactionUpdateDto dto) {
         validateTransactionUpdateDto(dto);
 
         jdbc.update(TransactionQueries.UPDATE)
-                .namedParam("id", id)
+                .namedParam("id", dto.getId())
                 .namedParam("status", dto.getStatus())
                 .namedParam("executionDate", dto.getExecutionDate())
                 .namedParam("authorizationDate", dto.getAuthorizationDate())
@@ -183,18 +229,24 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         }
 
         final WalletDto senderWallet = walletRepository.find(transaction.getSenderWalletId())
-                .orElseThrow();
+                .orElseThrow(() -> new TransactionOperationException("Wallet not found! ID: " + transaction.getSenderWalletId()));
 
         final WalletDto receiverWallet = walletRepository.find(transaction.getReceiverWalletId())
-                .orElseThrow();
+                .orElseThrow(() -> new TransactionOperationException("Wallet not found! ID: " + transaction.getReceiverWalletId()));
 
         if (!Objects.equals(senderWallet.getCurrency(), receiverWallet.getCurrency())) {
-            throw new IllegalArgumentException("Sender and receiver wallets must contain same currency!");
+            throw new TransactionOperationException("Sender and receiver wallets must contain same currency!");
         }
     }
 
     private void validateTransactionForCapture(final TransactionDto transaction) {
         if (transaction.getStatus() != TransactionStatus.AUTHORIZED) {
+            throw new IllegalArgumentException("Invalid transaction state!");
+        }
+    }
+
+    private void validateTransactionForCancel(final TransactionDto transaction) {
+        if (transaction.getStatus() == TransactionStatus.CANCELED) {
             throw new IllegalArgumentException("Invalid transaction state!");
         }
     }
@@ -221,7 +273,10 @@ public class TransactionRepositoryImpl implements TransactionRepository {
         if (dto == null) {
             throw new IllegalArgumentException("Parameter dto is mandatory!");
         }
-        if (dto.getAuthorizedAmount().compareTo(BigDecimal.ZERO) < 0) {
+        if (StringUtils.isBlank(dto.getId())) {
+            throw new IllegalArgumentException("Parameter dto.id is mandatory!");
+        }
+        if (dto.getAuthorizedAmount() != null && dto.getAuthorizedAmount().compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Parameter dto.authorizedAmount can not be negative!");
         }
         if (dto.getStatus() == null) {

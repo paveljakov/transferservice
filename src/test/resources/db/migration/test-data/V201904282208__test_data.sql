@@ -36,9 +36,9 @@ INSERT INTO TRANSACTION_LOG(ID, STATUS, CREATION_DATE, EXECUTION_DATE, AUTHORIZA
 VALUES ('0c66f551-21b8-41c2-91a2-44cedf93753c',
         'CONFIRMED',
         '2019-04-28 13:20:32.005',
-        '2019-04-28 13:20:32.005',
-        NULL,
+        '2019-04-28 13:20:32.007',
+        '2019-04-28 13:20:32.006',
         '8ba41a90-2f7c-465d-b4ff-990420138e22',
         'd2410f40-f9fd-40c5-8902-ea3ede77c7cd',
         50.00,
-        NULL);
+        50.00);

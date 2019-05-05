@@ -12,12 +12,12 @@ import spark.Request;
 import spark.Response;
 
 @Singleton
-class ClientErrorExceptionHandler implements ExceptionHandler<Exception> {
+class TransferErrorExceptionHandler implements ExceptionHandler<Exception> {
 
     private final ObjectMapper objectMapper;
 
     @Inject
-    public ClientErrorExceptionHandler(final ObjectMapper objectMapper) {
+    public TransferErrorExceptionHandler(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -28,7 +28,7 @@ class ClientErrorExceptionHandler implements ExceptionHandler<Exception> {
             response.type(CommonConstants.JSON_TYPE);
             response.body(objectMapper
                                   .writerWithDefaultPrettyPrinter()
-                                  .writeValueAsString(new ErrorMessage(400, "Bad request!")));
+                                  .writeValueAsString(new ErrorMessage(400, exception.getMessage())));
 
         } catch (JsonProcessingException e) {
             throw new IllegalStateException(e);

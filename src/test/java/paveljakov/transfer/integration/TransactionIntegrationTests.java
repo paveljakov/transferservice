@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.junit.Test;
 
 import paveljakov.transfer.dto.EntityIdResponseDto;
@@ -138,6 +138,117 @@ public class TransactionIntegrationTests extends IntegrationTestsBase {
 
         assertThat(receiverWallet.getBalanceAvailable()).isEqualByComparingTo(BigDecimal.valueOf(199.29).add(amount));
         assertThat(receiverWallet.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(199.29).add(amount));
+    }
+
+    @Test
+    public void testNewTransactionInsufficientFunds() throws IOException {
+        // Given
+        final String senderWalletId = "d2410f40-f9fd-40c5-8902-ea3ede77c7cd";
+        final String receiverWalletId = "8ba41a90-2f7c-465d-b4ff-990420138e22";
+        final BigDecimal amount = BigDecimal.valueOf(9999.99);
+
+        final TransactionCreateDto requestDto = new TransactionCreateDto(
+                senderWalletId,
+                receiverWalletId,
+                amount
+        );
+
+        final HttpPut createTxRequest = createJsonPut("http://localhost:8080/transactions", requestDto);
+        final HttpGet senderWalletRequest = new HttpGet("http://localhost:8080/wallets/" + senderWalletId);
+        final HttpGet receiverWalletRequest = new HttpGet("http://localhost:8080/wallets/" + receiverWalletId);
+
+        // When
+        final HttpResponse createTxRequestResponse = getHttp().execute(createTxRequest);
+        final HttpResponse senderWalletResponse = getHttp().execute(senderWalletRequest);
+        final HttpResponse receiverWalletResponse = getHttp().execute(receiverWalletRequest);
+
+        // Then
+        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_BAD_REQUEST);
+        assertThat(senderWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(receiverWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+
+        final HttpGet transactionsRequest = new HttpGet("http://localhost:8080/wallets/d2410f40-f9fd-40c5-8902-ea3ede77c7cd/transactions");
+        final HttpResponse transactionsResponse = getHttp().execute(transactionsRequest);
+        final TransactionDto[] transactions = deserializeResponseJson(transactionsResponse, TransactionDto[].class);
+
+        final TransactionDto transaction = Stream.of(transactions)
+                .filter(tx -> tx.getStatus() == TransactionStatus.CANCELED)
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(transaction.getSenderWalletId()).isEqualTo(senderWalletId);
+        assertThat(transaction.getReceiverWalletId()).isEqualTo(receiverWalletId);
+        assertThat(transaction.getAmount()).isEqualTo(amount);
+
+        final WalletDto senderWallet = deserializeResponseJson(senderWalletResponse, WalletDto.class);
+
+        assertThat(senderWallet.getBalanceAvailable()).isEqualByComparingTo(BigDecimal.valueOf(99.99));
+        assertThat(senderWallet.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(99.99));
+
+        final WalletDto receiverWallet = deserializeResponseJson(receiverWalletResponse, WalletDto.class);
+
+        assertThat(receiverWallet.getBalanceAvailable()).isEqualByComparingTo(BigDecimal.valueOf(199.29));
+        assertThat(receiverWallet.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(199.29));
+    }
+
+    @Test
+    public void testNewTransactionInvalidSenderWallet() throws IOException {
+        // Given
+        final String senderWalletId = "730c22c0-67f8-42eb-b66e-55bd80e4ddf5";
+        final String receiverWalletId = "8ba41a90-2f7c-465d-b4ff-990420138e22";
+        final BigDecimal amount = BigDecimal.valueOf(9999.99);
+
+        final TransactionCreateDto requestDto = new TransactionCreateDto(
+                senderWalletId,
+                receiverWalletId,
+                amount
+        );
+
+        final HttpPut createTxRequest = createJsonPut("http://localhost:8080/transactions", requestDto);
+        final HttpGet receiverWalletRequest = new HttpGet("http://localhost:8080/wallets/" + receiverWalletId);
+
+        // When
+        final HttpResponse createTxRequestResponse = getHttp().execute(createTxRequest);
+        final HttpResponse receiverWalletResponse = getHttp().execute(receiverWalletRequest);
+
+        // Then
+        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(receiverWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+
+        final WalletDto receiverWallet = deserializeResponseJson(receiverWalletResponse, WalletDto.class);
+
+        assertThat(receiverWallet.getBalanceAvailable()).isEqualByComparingTo(BigDecimal.valueOf(199.29));
+        assertThat(receiverWallet.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(199.29));
+    }
+
+    @Test
+    public void testNewTransactionInvalidReceiverWallet() throws IOException {
+        // Given
+        final String senderWalletId = "d2410f40-f9fd-40c5-8902-ea3ede77c7cd";
+        final String receiverWalletId = "730c22c0-67f8-42eb-b66e-55bd80e4ddf5";
+        final BigDecimal amount = BigDecimal.valueOf(9999.99);
+
+        final TransactionCreateDto requestDto = new TransactionCreateDto(
+                senderWalletId,
+                receiverWalletId,
+                amount
+        );
+
+        final HttpPut createTxRequest = createJsonPut("http://localhost:8080/transactions", requestDto);
+        final HttpGet senderWalletRequest = new HttpGet("http://localhost:8080/wallets/" + senderWalletId);
+
+        // When
+        final HttpResponse createTxRequestResponse = getHttp().execute(createTxRequest);
+        final HttpResponse senderWalletResponse = getHttp().execute(senderWalletRequest);
+
+        // Then
+        assertThat(createTxRequestResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertThat(senderWalletResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+
+        final WalletDto senderWallet = deserializeResponseJson(senderWalletResponse, WalletDto.class);
+
+        assertThat(senderWallet.getBalanceAvailable()).isEqualByComparingTo(BigDecimal.valueOf(99.99));
+        assertThat(senderWallet.getBalance()).isEqualByComparingTo(BigDecimal.valueOf(99.99));
     }
 
 }

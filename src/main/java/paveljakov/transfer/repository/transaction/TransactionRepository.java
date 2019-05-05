@@ -21,4 +21,6 @@ public interface TransactionRepository {
 
     void capture(String id);
 
+    void cancel(final String id);
+
 }

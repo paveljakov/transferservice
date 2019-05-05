@@ -54,7 +54,8 @@ public abstract class IntegrationTestsBase {
                 "org.h2.Driver",
                 "jdbc:h2:mem:" + databaseName,
                 "sa",
-                null
+                null,
+                new String[] {"db/migration/schema", "db/migration/test-data"}
         );
 
         final Application app = builder()

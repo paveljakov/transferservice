@@ -8,9 +8,8 @@ import dagger.MapKey;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
 import dagger.multibindings.Multibinds;
-import paveljakov.transfer.rest.error.ClientErrorExceptionHandler;
-import paveljakov.transfer.rest.error.ElementNotFoundExceptionHandler;
-import paveljakov.transfer.rest.error.GlobalExceptionHandler;
+import paveljakov.transfer.repository.transaction.TransactionOperationException;
+import paveljakov.transfer.repository.wallet.WalletOperationException;
 import spark.ExceptionHandler;
 
 @Module
@@ -22,7 +21,7 @@ public abstract class ErrorHandlersModule {
     @Binds
     @IntoMap
     @ExceptionType(Exception.class)
-    abstract ExceptionHandler<Exception> bindGlobalExceptionHandler(GlobalExceptionHandler exceptionHandler);
+    abstract ExceptionHandler<Exception> bindGenericExceptionHandler(GenericExceptionHandler exceptionHandler);
 
     @Binds
     @IntoMap
@@ -33,6 +32,16 @@ public abstract class ErrorHandlersModule {
     @IntoMap
     @ExceptionType(IllegalArgumentException.class)
     abstract ExceptionHandler<Exception> bindClientErrorExceptionHandler(ClientErrorExceptionHandler exceptionHandler);
+
+    @Binds
+    @IntoMap
+    @ExceptionType(WalletOperationException.class)
+    abstract ExceptionHandler<Exception> bindWalletErrorExceptionHandler(TransferErrorExceptionHandler exceptionHandler);
+
+    @Binds
+    @IntoMap
+    @ExceptionType(TransactionOperationException.class)
+    abstract ExceptionHandler<Exception> bindTransactionErrorExceptionHandler(TransferErrorExceptionHandler exceptionHandler);
 
     @MapKey
     @interface ExceptionType {

@@ -12,7 +12,8 @@ public class Main {
                 "org.h2.Driver",
                 "jdbc:h2:mem:transferdb",
                 "sa",
-                null
+                null,
+                new String[] {"db/migration/schema", "db/migration/sample-data"}
         );
 
         final Application app = builder()

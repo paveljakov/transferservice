@@ -20,6 +20,8 @@ public interface WalletRepository {
 
     void authorizeAmount(String id, WalletMonetaryAmountDto dto);
 
+    void unauthorizeAmount(String id, WalletMonetaryAmountDto dto);
+
     void captureAmount(String id, WalletMonetaryAmountDto dto);
 
 }

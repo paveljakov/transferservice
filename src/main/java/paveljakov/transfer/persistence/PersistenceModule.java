@@ -31,9 +31,10 @@ public class PersistenceModule {
 
     @Provides
     @Singleton
-    Flyway provideFlyway(final DataSource dataSource) {
+    Flyway provideFlyway(final DataSource dataSource, final Configuration configuration) {
         return Flyway.configure()
                 .dataSource(dataSource)
+                .locations(configuration.getMigrationLocations())
                 .load();
     }
 

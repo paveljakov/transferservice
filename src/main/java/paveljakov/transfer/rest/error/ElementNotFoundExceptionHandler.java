@@ -6,13 +6,11 @@ import javax.inject.Singleton;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
 import paveljakov.transfer.common.CommonConstants;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
 
-@Slf4j
 @Singleton
 class ElementNotFoundExceptionHandler implements ExceptionHandler<Exception> {
 
