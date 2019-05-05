@@ -22,6 +22,8 @@ Service is implemented using following technology stack:
 | /transactions                      | PUT         | Create new transaction    |
 
 ### Get all accounts
+`GET /accounts`
+
 Response:
 ```
 [ {
@@ -43,6 +45,8 @@ Response:
 ```
 
 ### Add new account
+`PUT /accounts`
+
 Request:
 ```
 {
@@ -59,6 +63,8 @@ Response:
 ```
 
 ### Get account by ID
+`GET /accounts/{accountId}`
+
 Response:
 ```
 {
@@ -70,6 +76,8 @@ Response:
 ```
 
 ### Get account wallets
+`GET /accounts/{accountId}/wallets`
+
 Response:
 ```
 [ {
@@ -92,6 +100,8 @@ Response:
 ```
 
 ### Add new wallet to account
+`PUT /accounts/{accountId}/wallets`
+
 Request:
 ```
 {
@@ -106,6 +116,8 @@ Response:
 ```
 
 ### Get account transactions
+`GET /accounts/{accountId}/transactions`
+
 Response:
 ```
 [ {
@@ -142,6 +154,8 @@ Response:
 ```
 
 ### Get wallet by ID
+`GET /wallets/{walletId}`
+
 Response:
 ```
 {
@@ -156,6 +170,8 @@ Response:
 ```
 
 ### Add funds to wallet
+`POST /wallets/{walletId}`
+
 Request:
 ```
 {
@@ -164,6 +180,8 @@ Request:
 ```
 
 ### Get wallet transactions
+`GET /wallets/{walletId}/transactions`
+
 Response:
 ```
 [ {
@@ -200,6 +218,8 @@ Response:
 ```
 
 ### Get transaction by ID
+`GET /transactions/{transactionId}`
+
 Response:
 ```
 {
@@ -216,6 +236,8 @@ Response:
 ```
 
 ### Create new transaction
+`PUT /transactions`
+
 Request:
 ```
 {
